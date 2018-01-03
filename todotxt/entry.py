@@ -1,7 +1,7 @@
 import re
 import string
-from typing import Set, Dict, Sequence, List
-from uuid import uuid4
+from typing import Set, Dict, List
+from itertools import count
 
 __author__ = "Bogdan Gladyshev"
 __copyright__ = "Copyright 2017, Bogdan Gladyshev"
@@ -175,6 +175,14 @@ class TodoEntry:  # pylint: disable=too-many-instance-attributes
         self._tags[key] = value
         self._full_text = f'{self._full_text} {tag}'
 
+    def _search_merge_tag_name(self, tag_name: str) -> str:
+        for index in count():
+            new_tag_name = f"{tag_name}-merge{index}"
+            if new_tag_name not in self._tags:
+                return new_tag_name
+        # Impossible to get here, just to fix CQ tools warning
+        return tag_name  # pragma: no cover
+
     def merge(self, entry: 'TodoEntry') -> None:
         """
         Merge given entry into this one. Merge with processed with next rules:
@@ -182,7 +190,8 @@ class TodoEntry:  # pylint: disable=too-many-instance-attributes
         2. All projects from given entry will be added to original
         3. All contexts from given entry will be added to original
         4. All tags from given entry will be added to original
-        5. If given entry has same tag with different value, new tag like `tag-uuid4` will be created with this value
+        5. If given entry has same tag with different value, new tag like `tag-merge` will be created with this value.
+        If `tag-merge` already exists, `tag-old2` will be used and so.
         6. If given or original issue is completed, that result will be completed too.
         7. Select min creation date
         8. Select max completed_date
@@ -203,7 +212,7 @@ class TodoEntry:  # pylint: disable=too-many-instance-attributes
         for tag_name, tag_value in entry.tags.items():
             if tag_name in self.tags:
                 if self.tags.get(tag_name) != tag_value:
-                    self.add_tag(f'{tag_name}-{str(uuid4())}', tag_value)
+                    self.add_tag(self._search_merge_tag_name(tag_name), tag_value)
             else:
                 self.add_tag(tag_name, tag_value)
 

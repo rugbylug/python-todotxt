@@ -194,4 +194,14 @@ MERGE_TEST_TUPLE = (
         'x 2017-01-05 2017-01-04 Make +T1 +T2 +T3 c1:c2 c3:c4 with t5:t6',
         'x 2017-01-05 2017-01-03 Make @Cute +T1 +T2 c1:c2 c3:c4 with t5:t6 +T3'
     ),
+    (
+        'Make @Cute +T1 +T2 c1:c2 c3:c4 with',
+        'Make @Cute2 +T1 +T2 c1:c2 c3:c5 with',
+        'Make @Cute +T1 +T2 c1:c2 c3:c4 with @Cute2 c3-merge0:c5'
+    ),
+    (
+        'Make @Cute +T1 +T2 c1:c2 c3:c4 with @Cute2 c3-merge0:c5',
+        'Make @Cute2 +T1 +T2 c1:c2 c3:c6 with',
+        'Make @Cute +T1 +T2 c1:c2 c3:c4 with @Cute2 c3-merge0:c5 c3-merge1:c6'
+    ),
 )
