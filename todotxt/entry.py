@@ -12,13 +12,13 @@ __maintainer__ = "Bogdan Gladyshev"
 __email__ = "siredvin.dark@gmail.com"
 __status__ = "Production"
 
-__all__ = ['TodoEntry', 'DEFAULT_EMPTY_PRIORITY']
+__all__ = ['TodoEntry', 'EMPTY_PRIORITY_MOCK']
 
 
 TODO_TXT_PRIORITY_REGEX = re.compile(r'\([A-Z]\)')
 TODO_TXT_PRIORITY_EXTENDED_REGEX = re.compile(r'\([A-Z]\)\s')
 TODO_TXT_DATE_FORMAT = re.compile(r'\d{4}-\d{2}-\d{2}')
-DEFAULT_EMPTY_PRIORITY = 'ZZZ'
+EMPTY_PRIORITY_MOCK = 'ZZZ'
 
 
 class TodoEntry:  # pylint: disable=too-many-instance-attributes
@@ -118,11 +118,14 @@ class TodoEntry:  # pylint: disable=too-many-instance-attributes
 
     @completed_date.setter
     def completed_date(self, value: str) -> None:
-        if not self._completed:
+        if not self._completed and value is not None:
             raise ValueError("Please, complete todo entry first")
-        if not self._created_date:
+        if not self._created_date and value is not None:
             raise ValueError("Cannot set completed_date without created_date")
-        if self._completed_date:
+        if value is None:
+            if self._completed_date is not None:
+                self._full_text = self._full_text.replace(f"{self._completed_date} ", '', 1)
+        elif self._completed_date:
             self._full_text = self._full_text.replace(self._completed_date, value, 1)
         else:
             self._full_text = self._full_text.replace(
@@ -136,7 +139,10 @@ class TodoEntry:  # pylint: disable=too-many-instance-attributes
 
     @created_date.setter
     def created_date(self, value: str) -> None:
-        if self._created_date:
+        if value is None:
+            if self._created_date is not None:
+                self._full_text = self._full_text.replace(f"{self._created_date} ", '', 1)
+        elif self._created_date:
             if self._completed_date == self._created_date:
                 self._full_text = self._full_text.replace(self._created_date, value, 2)
                 self._full_text = self._full_text.replace(value, self._completed_date, 1)
@@ -169,23 +175,37 @@ class TodoEntry:  # pylint: disable=too-many-instance-attributes
         self._tags[key] = value
         self._full_text = f'{self._full_text} {tag}'
 
-    def merge_with_issue(self, issue: 'TodoEntry') -> None:
-        self.priority = min(self.priority or DEFAULT_EMPTY_PRIORITY, issue.priority or DEFAULT_EMPTY_PRIORITY)
-        if self.priority == DEFAULT_EMPTY_PRIORITY:
-            self.priority = None
-        self.projects |= issue.projects
-        self.contexts |= issue.contexts
-        self.completed = issue.completed or self.completed
-        for tag_name, tag_value in issue.tags.items():
+    def merge(self, entry: 'TodoEntry') -> None:
+        """
+        Merge given entry into this one. Merge with processed with next rules:
+        1. Choose max priority from original and given entry
+        2. All projects from given entry will be added to original
+        3. All contexts from given entry will be added to original
+        4. All tags from given entry will be added to original
+        5. If given entry has same tag with different value, new tag like `tag-uuid4` will be created with this value
+        6. If given or original issue is completed, that result will be completed too.
+        7. Select min creation date
+        8. Select max completed_date
+
+        :param entry: entry to merge with
+        """
+        self.priority = min(self.priority, entry.priority, key=lambda x: x or EMPTY_PRIORITY_MOCK)
+        self.created_date = min(self.created_date, entry.created_date, key=lambda x: x or EMPTY_PRIORITY_MOCK)
+        for project in entry.projects:
+            if project not in self._projects:
+                self.add_project(project)
+        for context in entry.contexts:
+            if context not in self._contexts:
+                self.add_context(context)
+        self.completed = entry.completed or self.completed
+        if self.completed:
+            self.completed_date = max(self.completed_date, entry.completed_date, key=lambda x: x or '')
+        for tag_name, tag_value in entry.tags.items():
             if tag_name in self.tags:
                 if self.tags.get(tag_name) != tag_value:
                     self.add_tag(f'{tag_name}-{str(uuid4())}', tag_value)
             else:
                 self.add_tag(tag_name, tag_value)
-
-    def merge_with_issues(self, issues: Sequence['TodoEntry']) -> None:
-        for issue in issues:
-            self.merge_with_issue(issue)
 
     def __eq__(self, other) -> bool:
         return str(self) == str(other)

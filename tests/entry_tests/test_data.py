@@ -92,6 +92,16 @@ COMPLETED_DATE_TEST_TUPLE = (
         'x (A) 2017-01-02 2017-01-01 2017-01-03 Make @Cute +T1 +T2 c1:c2 c3:c4 with c-c-c-c-c',
         '2017-01-02'
     ),
+    (
+        'x (A) 2017-01-03 2017-01-01 2017-01-03 Make @Cute +T1 +T2 c1:c2 c3:c4 with c-c-c-c-c',
+        'x (A) 2017-01-01 2017-01-03 Make @Cute +T1 +T2 c1:c2 c3:c4 with c-c-c-c-c',
+        None
+    ),
+    (
+        'x (A) 2017-01-01 2017-01-03 Make @Cute +T1 +T2 c1:c2 c3:c4 with c-c-c-c-c',
+        'x (A) 2017-01-03 Make @Cute +T1 +T2 c1:c2 c3:c4 with c-c-c-c-c',
+        None
+    ),
 )
 
 CREATED_DATE_TEST_TUPLE = (
@@ -99,6 +109,11 @@ CREATED_DATE_TEST_TUPLE = (
         '2017-01-01 Make @Cute +T1 +T2 c1:c2 c3:c4 with c-c-c-c-c',
         '2017-01-02 Make @Cute +T1 +T2 c1:c2 c3:c4 with c-c-c-c-c',
         '2017-01-02'
+    ),
+    (
+        '2017-01-01 Make @Cute +T1 +T2 c1:c2 c3:c4 with c-c-c-c-c',
+        'Make @Cute +T1 +T2 c1:c2 c3:c4 with c-c-c-c-c',
+        None
     ),
     (
         'Make @Cute +T1 +T2 c1:c2 c3:c4 with c-c-c-c-c',
@@ -116,6 +131,11 @@ CREATED_DATE_TEST_TUPLE = (
         '2017-01-02'
     ),
     (
+        '(A) 2017-01-01 Make @Cute +T1 +T2 c1:c2 c3:c4 with c-c-c-c-c',
+        '(A) Make @Cute +T1 +T2 c1:c2 c3:c4 with c-c-c-c-c',
+        None
+    ),
+    (
         '(A) Make @Cute +T1 +T2 c1:c2 c3:c4 with c-c-c-c-c',
         '(A) 2017-01-02 Make @Cute +T1 +T2 c1:c2 c3:c4 with c-c-c-c-c',
         '2017-01-02'
@@ -129,5 +149,49 @@ CREATED_DATE_TEST_TUPLE = (
         'x 2017-01-01 2017-01-01 Make @Cute +T1 +T2 c1:c2 c3:c4 with c-c-c-c-c',
         'x 2017-01-01 2017-01-02 Make @Cute +T1 +T2 c1:c2 c3:c4 with c-c-c-c-c',
         '2017-01-02'
+    ),
+    (
+        'Make @Cute +T1 +T2 c1:c2 c3:c4 with c-c-c-c-c',
+        'Make @Cute +T1 +T2 c1:c2 c3:c4 with c-c-c-c-c',
+        None
+    ),
+    (
+        'x 2017-01-01 2017-01-01 Make @Cute +T1 +T2 c1:c2 c3:c4 with c-c-c-c-c',
+        'x 2017-01-01 Make @Cute +T1 +T2 c1:c2 c3:c4 with c-c-c-c-c',
+        None
+    ),
+)
+
+
+MERGE_TEST_TUPLE = (
+    (
+        'Make @Cute +T1 +T2 c1:c2 c3:c4 with',
+        'Make @Cute2 +T1 +T2 c1:c2 c3:c4 with',
+        'Make @Cute +T1 +T2 c1:c2 c3:c4 with @Cute2'
+    ),
+    (
+        'Make @Cute +T1 +T2 c1:c2 c3:c4 with',
+        'Make +T1 +T2 +T3 c1:c2 c3:c4 with',
+        'Make @Cute +T1 +T2 c1:c2 c3:c4 with +T3'
+    ),
+    (
+        'Make @Cute +T1 +T2 c1:c2 c3:c4 with',
+        'Make +T1 +T2 +T3 c1:c2 c3:c4 with t5:t6',
+        'Make @Cute +T1 +T2 c1:c2 c3:c4 with +T3 t5:t6'
+    ),
+    (
+        'Make @Cute +T1 +T2 c1:c2 c3:c4 with t5:t6',
+        'Make +T1 +T2 +T3 c1:c2 c3:c4 with t5:t6',
+        'Make @Cute +T1 +T2 c1:c2 c3:c4 with t5:t6 +T3'
+    ),
+    (
+        'x Make @Cute +T1 +T2 c1:c2 c3:c4 with t5:t6',
+        'Make +T1 +T2 +T3 c1:c2 c3:c4 with t5:t6',
+        'x Make @Cute +T1 +T2 c1:c2 c3:c4 with t5:t6 +T3'
+    ),
+    (
+        'x 2017-01-04 2017-01-03 Make @Cute +T1 +T2 c1:c2 c3:c4 with t5:t6',
+        'x 2017-01-05 2017-01-04 Make +T1 +T2 +T3 c1:c2 c3:c4 with t5:t6',
+        'x 2017-01-05 2017-01-03 Make @Cute +T1 +T2 c1:c2 c3:c4 with t5:t6 +T3'
     ),
 )
