@@ -1,0 +1,14 @@
+.venv
+.vscode
+__pycache__
+check.py
+dist/
+*.egg-info
+.idea
+build
+.mypy_cache
+.ipynb_checkpoints
+Test.ipynb
+.hypothesis
+.cache
+.coverage
