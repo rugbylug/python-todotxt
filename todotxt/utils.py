@@ -10,7 +10,7 @@ __status__ = "Production"
 __all__ = ['ComparationMock']
 
 
-class ComparationMock:
+class ComparationMock:  # pylint: disable=too-few-public-methods
 
     __slots__ = ['_always_max']
 
