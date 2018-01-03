@@ -3,6 +3,8 @@ import string
 from typing import Set, Dict, List
 from itertools import count
 
+from .utils import ComparationMock
+
 __author__ = "Bogdan Gladyshev"
 __copyright__ = "Copyright 2017, Bogdan Gladyshev"
 __credits__ = ["Bogdan Gladyshev"]
@@ -12,13 +14,14 @@ __maintainer__ = "Bogdan Gladyshev"
 __email__ = "siredvin.dark@gmail.com"
 __status__ = "Production"
 
-__all__ = ['TodoEntry', 'EMPTY_PRIORITY_MOCK']
+__all__ = ['TodoEntry', 'ALWAYS_MAX_MOCK', 'ALWAYS_MIN_MOCK']
 
 
 TODO_TXT_PRIORITY_REGEX = re.compile(r'\([A-Z]\)')
 TODO_TXT_PRIORITY_EXTENDED_REGEX = re.compile(r'\([A-Z]\)\s')
 TODO_TXT_DATE_FORMAT = re.compile(r'\d{4}-\d{2}-\d{2}')
-EMPTY_PRIORITY_MOCK = 'ZZZ'
+ALWAYS_MAX_MOCK = ComparationMock()
+ALWAYS_MIN_MOCK = ComparationMock(always_max=False)
 
 
 class TodoEntry:  # pylint: disable=too-many-instance-attributes
@@ -199,8 +202,8 @@ class TodoEntry:  # pylint: disable=too-many-instance-attributes
 
         :param entry: entry to merge with
         """
-        self.priority = min(self.priority, entry.priority, key=lambda x: x or EMPTY_PRIORITY_MOCK)
-        self.created_date = min(self.created_date, entry.created_date, key=lambda x: x or EMPTY_PRIORITY_MOCK)
+        self.priority = min(self.priority, entry.priority, key=lambda x: x or ALWAYS_MAX_MOCK)
+        self.created_date = min(self.created_date, entry.created_date, key=lambda x: x or ALWAYS_MAX_MOCK)
         for project in entry.projects:
             if project not in self._projects:
                 self.add_project(project)
@@ -209,7 +212,7 @@ class TodoEntry:  # pylint: disable=too-many-instance-attributes
                 self.add_context(context)
         self.completed = entry.completed or self.completed
         if self.completed:
-            self.completed_date = max(self.completed_date, entry.completed_date, key=lambda x: x or '')
+            self.completed_date = max(self.completed_date, entry.completed_date, key=lambda x: x or ALWAYS_MIN_MOCK)
         for tag_name, tag_value in entry.tags.items():
             if tag_name in self.tags:
                 if self.tags.get(tag_name) != tag_value:

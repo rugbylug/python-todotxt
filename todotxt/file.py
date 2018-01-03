@@ -1,6 +1,6 @@
 from typing import Sequence, List
 
-from .entry import TodoEntry, EMPTY_PRIORITY_MOCK
+from .entry import TodoEntry, ALWAYS_MAX_MOCK
 
 __author__ = "Bogdan Gladyshev"
 __copyright__ = "Copyright 2017, Bogdan Gladyshev"
@@ -47,7 +47,7 @@ class TodoFile:
             self.todo_entries.extend(TodoEntry(x) for x in todo_file.readlines())
 
     def sort_entries(self, sort_field='priority') -> None:
-        self.todo_entries = sorted(self.todo_entries, key=lambda x: getattr(x, sort_field) or EMPTY_PRIORITY_MOCK)
+        self.todo_entries = sorted(self.todo_entries, key=lambda x: getattr(x, sort_field) or ALWAYS_MAX_MOCK)
 
     def save(self, sort_field='priority') -> None:
         self.sort_entries(sort_field=sort_field)
