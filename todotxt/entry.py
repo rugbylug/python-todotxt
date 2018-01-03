@@ -186,12 +186,13 @@ class TodoEntry:  # pylint: disable=too-many-instance-attributes
     def merge(self, entry: 'TodoEntry') -> None:
         """
         Merge given entry into this one. Merge with processed with next rules:
+
         1. Choose max priority from original and given entry
         2. All projects from given entry will be added to original
         3. All contexts from given entry will be added to original
         4. All tags from given entry will be added to original
-        5. If given entry has same tag with different value, new tag like `tag-merge` will be created with this value.
-        If `tag-merge` already exists, `tag-old2` will be used and so.
+        5. If given entry has same tag with different value, new tag like :code:`tag-merge` will be created with this value.
+           If :code:`tag-merge0` already exists, :code:`tag-merge1` will be used and so.
         6. If given or original issue is completed, that result will be completed too.
         7. Select min creation date
         8. Select max completed_date
