@@ -169,14 +169,26 @@ class TodoEntry:  # pylint: disable=too-many-instance-attributes
         self._projects.add(project)
         self._full_text = f'{self._full_text} +{project}'
 
+    def remove_project(self, project: str) -> None:
+        self._projects.remove(project)
+        self._full_text = self._full_text.replace(f" +{project}", "")
+
     def add_context(self, context: str) -> None:
         self._contexts.add(context)
         self._full_text = f'{self._full_text} @{context}'
+
+    def remove_context(self, context: str) -> None:
+        self._contexts.remove(context)
+        self._full_text = self._full_text.replace(f" @{context}", "")
 
     def add_tag(self, key: str, value: str) -> None:
         tag = f"{key}:{value}"
         self._tags[key] = value
         self._full_text = f'{self._full_text} {tag}'
+
+    def remove_tag(self, key: str, value: str) -> None:
+        self._tags.pop(key, None)
+        self._full_text = self._full_text.replace(f" {key}:{value}", "")
 
     def _search_merge_tag_name(self, tag_name: str) -> str:
         for index in count():
