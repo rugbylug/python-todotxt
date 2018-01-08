@@ -11,7 +11,7 @@ with open('README.rst') as readme_file:
 
 setup(
     name='python-todotxt',
-    version='0.1.0',
+    version='0.1.1',
     description="Simple python library for todo.txt file format",
     long_description=readme,
     author="Bogdan Gladyshev",
