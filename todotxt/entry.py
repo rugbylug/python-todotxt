@@ -33,19 +33,19 @@ class TodoEntry:  # pylint: disable=too-many-instance-attributes
     ]
 
     def __init__(  # pylint: disable=too-many-arguments
-            self, full_text: str) -> None:
-        self._full_text: str = full_text.strip()
-        self._projects: Set[str] = set()
-        self._contexts: Set[str] = set()
-        self._completed: bool = False
-        self._completed_date: str = None
-        self._created_date: str = None
-        self._tags: Dict[str, str] = {}
-        self._priority: str = None
+            self, full_text ) :
+        self._full_text = full_text.strip()
+        self._projects = set()
+        self._contexts = set()
+        self._completed = False
+        self._completed_date = None
+        self._created_date = None
+        self._tags = {}
+        self._priority = None
         self._load_text()
 
-    def _load_text(self) -> None:
-        tokenized_entries: List[str] = self._full_text.split(' ')
+    def _load_text(self) :
+        tokenized_entries = self._full_text.split(' ')
         self._completed = self._full_text.startswith('x ')
         self._priority = next(filter(TODO_TXT_PRIORITY_REGEX.match, tokenized_entries), None)
         if self._priority:
@@ -70,24 +70,24 @@ class TodoEntry:  # pylint: disable=too-many-instance-attributes
             self._completed_date = None
 
     @property
-    def completed(self) -> bool:
+    def completed(self) :
         return self._completed
 
     @completed.setter
-    def completed(self, value: bool) -> None:
+    def completed(self, value ) :
         if self._completed != value:
             if value:
-                self._full_text = f"x {self._full_text}"
+                self._full_text = "x " +str(self._full_text)
             else:
                 self._full_text = self._full_text[2:]
             self._completed = value
 
     @property
-    def priority(self) -> str:
+    def priority(self) :
         return self._priority
 
     @priority.setter
-    def priority(self, priority: str) -> None:
+    def priority(self, priority ) :
         if priority is not None and priority not in string.ascii_uppercase:
             raise ValueError("Priority should be one upper case english letter")
         if priority is None:
@@ -95,56 +95,56 @@ class TodoEntry:  # pylint: disable=too-many-instance-attributes
                 self._full_text = TODO_TXT_PRIORITY_EXTENDED_REGEX.sub("", self._full_text, count=1)
         else:
             if self._priority is not None:
-                self._full_text = TODO_TXT_PRIORITY_REGEX.sub(f"({priority})", self._full_text, count=1)
+                self._full_text = TODO_TXT_PRIORITY_REGEX.sub("({priority})".format(priority=priority), self._full_text, count=1)
             else:
                 if self._completed:
-                    self._full_text = self._full_text.replace('x', f"x ({priority})", 1)
+                    self._full_text = self._full_text.replace('x', "x ({priority})".format(priority=priority), 1)
                 else:
-                    self._full_text = f"({priority}) {self._full_text}"
+                    self._full_text = "({priority}) {full_text}".format(priority=priority, full_text=self._full_text)
         self._priority = priority
 
     @property
-    def projects(self) -> Set[str]:
+    def projects(self) :
         return self._projects
 
     @property
-    def contexts(self) -> Set[str]:
+    def contexts(self) :
         return self._contexts
 
     @property
-    def tags(self) -> Dict[str, str]:
+    def tags(self) :
         return self._tags
 
     @property
-    def completed_date(self) -> str:
+    def completed_date(self) :
         return self._completed_date
 
     @completed_date.setter
-    def completed_date(self, value: str) -> None:
+    def completed_date(self, value ) :
         if not self._completed and value is not None:
             raise ValueError("Please, complete todo entry first")
         if not self._created_date and value is not None:
             raise ValueError("Cannot set completed_date without created_date")
         if value is None:
             if self._completed_date is not None:
-                self._full_text = self._full_text.replace(f"{self._completed_date} ", '', 1)
+                self._full_text = self._full_text.replace(str(self._completed_date)+" ", '', 1)
         elif self._completed_date:
             self._full_text = self._full_text.replace(self._completed_date, value, 1)
         else:
             self._full_text = self._full_text.replace(
-                self._created_date, f"{value} {self._created_date}", 1
+                self._created_date, "{value} {created_date}".format(value=value, created_date=self._created_date), 1
             )
         self._completed_date = value
 
     @property
-    def created_date(self) -> str:
+    def created_date(self) :
         return self._created_date
 
     @created_date.setter
-    def created_date(self, value: str) -> None:
+    def created_date(self, value ) :
         if value is None:
             if self._created_date is not None:
-                self._full_text = self._full_text.replace(f"{self._created_date} ", '', 1)
+                self._full_text = self._full_text.replace("{created_date} ".format(created_date=self._created_date), '', 1)
         elif self._created_date:
             if self._completed_date == self._created_date:
                 self._full_text = self._full_text.replace(self._created_date, value, 2)
@@ -154,51 +154,51 @@ class TodoEntry:  # pylint: disable=too-many-instance-attributes
         else:
             if self._priority:
                 self._full_text = self._full_text.replace(
-                    f"({self._priority})",
-                    f"({self._priority}) {value}",
+                    "("+str(self._priority)+")",
+                    "("+str(self._priority)+") "+str(value),
                     1
                 )
             else:
                 if self._completed:
-                    self._full_text = self._full_text.replace('x', f"x {value}", 1)
+                    self._full_text = self._full_text.replace('x', "x "+str(value), 1)
                 else:
-                    self._full_text = f"{value} {self._full_text}"
+                    self._full_text = ""+str(value)+" "+str(self._full_text)
         self._created_date = value
 
-    def add_project(self, project: str) -> None:
+    def add_project(self, project ) :
         self._projects.add(project)
-        self._full_text = f'{self._full_text} +{project}'
+        self._full_text = ''+str(self._full_text)+' +'+str(project)
 
-    def remove_project(self, project: str) -> None:
+    def remove_project(self, project ) :
         self._projects.remove(project)
-        self._full_text = self._full_text.replace(f" +{project}", "")
+        self._full_text = self._full_text.replace(" +"+str(project), "")
 
-    def add_context(self, context: str) -> None:
+    def add_context(self, context ) :
         self._contexts.add(context)
-        self._full_text = f'{self._full_text} @{context}'
+        self._full_text = ''+str(self._full_text)+' @'+str(context)
 
-    def remove_context(self, context: str) -> None:
+    def remove_context(self, context ) :
         self._contexts.remove(context)
-        self._full_text = self._full_text.replace(f" @{context}", "")
+        self._full_text = self._full_text.replace(" @"+str(context), "")
 
-    def add_tag(self, key: str, value: str) -> None:
-        tag = f"{key}:{value}"
+    def add_tag(self, key , value ) :
+        tag = ""+str(key)+":"+str(value)
         self._tags[key] = value
-        self._full_text = f'{self._full_text} {tag}'
+        self._full_text = ''+str(self._full_text)+' '+str(tag)
 
-    def remove_tag(self, key: str, value: str) -> None:
+    def remove_tag(self, key , value ) :
         self._tags.pop(key, None)
-        self._full_text = self._full_text.replace(f" {key}:{value}", "")
+        self._full_text = self._full_text.replace(" "+str(key)+":"+str(value), "")
 
-    def _search_merge_tag_name(self, tag_name: str) -> str:
+    def _search_merge_tag_name(self, tag_name ) :
         for index in count():
-            new_tag_name = f"{tag_name}-merge{index}"
+            new_tag_name = ""+str(tag_name)+"-merge"+str(index)
             if new_tag_name not in self._tags:
                 return new_tag_name
         # Impossible to get here, just to fix CQ tools warning
         return tag_name  # pragma: no cover
 
-    def merge(self, entry: 'TodoEntry') -> None:
+    def merge(self, entry ) :
         """
         Merge given entry into this one. Merge with processed with next rules:
 
@@ -232,14 +232,14 @@ class TodoEntry:  # pylint: disable=too-many-instance-attributes
             else:
                 self.add_tag(tag_name, tag_value)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other) :
         return str(self) == str(other)
 
-    def __hash__(self) -> int:
+    def __hash__(self) :
         return hash(self._full_text)
 
-    def __str__(self) -> str:
+    def __str__(self) :
         return self._full_text
 
-    def __repr__(self) -> str:
+    def __repr__(self) :
         return self._full_text
